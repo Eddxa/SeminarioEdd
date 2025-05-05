@@ -1,0 +1,153 @@
+(venv-tf) edgar@Eddxa:~/Escritorio/TESIS/code fine-tunning$ "/home/edgar/Escritorio/TESIS/code fine-tunning/venv-tf/bin/python" "/home/edgar/Escritorio/TESIS/code fine-tunning/pruebalow.py"
+2025-05-05 13:10:41.875667: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2025-05-05 13:10:41.893269: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2025-05-05 13:10:41.930634: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1746465041.979208   23045 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1746465041.991788   23045 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1746465042.048460   23045 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1746465042.048515   23045 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1746465042.048520   23045 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1746465042.048525   23045 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-05-05 13:10:42.060612: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+--- Paso 2: Cargando datos desde: ./testfiles/ ---
+Encontrados 10 archivos Markdown. Leyendo contenido...
+Se cargaron 10 documentos Markdown con contenido.
+Dataset cargado exitosamente:
+Dataset({
+    features: ['text'],
+    num_rows: 10
+})
+
+Dataset dividido en train, validation y test:
+DatasetDict({
+    train: Dataset({
+        features: ['text'],
+        num_rows: 8
+    })
+    validation: Dataset({
+        features: ['text'],
+        num_rows: 1
+    })
+    test: Dataset({
+        features: ['text'],
+        num_rows: 1
+    })
+})
+
+--- Paso 3: Cargando Tokenizador y Modelo (distilbert-base-uncased) ---
+2025-05-05 13:11:35.070171: E external/local_xla/xla/stream_executor/cuda/cuda_platform.cc:51] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+All PyTorch model weights were used when initializing TFDistilBertForMaskedLM.
+
+All the weights of TFDistilBertForMaskedLM were initialized from the PyTorch model.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use TFDistilBertForMaskedLM for predictions without further training.
+
+Resumen de la arquitectura del modelo:
+Model: "tf_distil_bert_for_masked_lm"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ distilbert (TFDistilBertMa  multiple                  66362880  
+ inLayer)                                                        
+                                                                 
+ vocab_transform (Dense)     multiple                  590592    
+                                                                 
+ vocab_layer_norm (LayerNor  multiple                  1536      
+ malization)                                                     
+                                                                 
+ vocab_projector (TFDistilB  multiple                  23866170  
+ ertLMHead)                                                      
+                                                                 
+=================================================================
+Total params: 66985530 (255.53 MB)
+Trainable params: 66985530 (255.53 MB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+
+Longitud máxima de contexto del tokenizador/modelo: 512
+
+--- Paso 4: Preprocesando los Datos ---
+Tokenizando los datasets (puede tardar un poco)...
+Map:   0%|                                                                                     | 0/8 [00:00<?, ? examples/s]Token indices sequence length is longer than the specified maximum sequence length for this model (12433 > 512). Running this sequence through the model will result in indexing errors
+Map: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:00<00:00, 41.67 examples/s]
+Map: 100%|█████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 60.35 examples/s]
+Map: 100%|█████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  5.43 examples/s]
+Datasets tokenizados:
+DatasetDict({
+    train: Dataset({
+        features: ['input_ids', 'attention_mask', 'word_ids'],
+        num_rows: 8
+    })
+    validation: Dataset({
+        features: ['input_ids', 'attention_mask', 'word_ids'],
+        num_rows: 1
+    })
+    test: Dataset({
+        features: ['input_ids', 'attention_mask', 'word_ids'],
+        num_rows: 1
+    })
+})
+
+Agrupando textos en chunks de tamaño 128 (puede tardar)...
+Map: 100%|█████████████████████████████████████████████████████████████████████████████| 8/8 [00:00<00:00, 51.26 examples/s]
+Map: 100%|█████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 45.63 examples/s]
+Map: 100%|█████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  6.32 examples/s]
+Datasets listos para el entrenamiento MLM (agrupados y fragmentados):
+DatasetDict({
+    train: Dataset({
+        features: ['input_ids', 'attention_mask', 'word_ids', 'labels'],
+        num_rows: 135
+    })
+    validation: Dataset({
+        features: ['input_ids', 'attention_mask', 'word_ids', 'labels'],
+        num_rows: 3
+    })
+    test: Dataset({
+        features: ['input_ids', 'attention_mask', 'word_ids', 'labels'],
+        num_rows: 189
+    })
+})
+
+--- Paso 5: Configurando el Data Collator ---
+Usando DataCollatorForLanguageModeling con probabilidad de máscara 0.15
+
+--- Paso 6: Preparando tf.data Datasets ---
+Datasets tf.data listos para el entrenamiento y evaluación.
+
+--- Paso 7: Configurando el Entrenamiento ---
+Número total de pasos de entrenamiento estimado: 33
+Modelo compilado con el optimizador AdamW.
+El modelo se guardará localmente al final del entrenamiento (PUSH_TO_HUB=False).
+
+--- Paso 8: Evaluando Perplejidad Inicial (Antes del Fine-tuning) ---
+Evaluando en el dataset de validación...
+Perplejidad en el set de validación (antes): 29.76
+
+--- Paso 9: Iniciando Fine-tuning ---
+Entrenando por 1 épocas...
+33/33 [==============================] - 207s 6s/step - loss: 3.6856 - val_loss: 2.9392
+--- Fine-tuning completado ---
+
+--- Paso 10: Evaluando Perplejidad Final (Después del Fine-tuning) ---
+Evaluando en el dataset de validación (final)...
+Perplejidad en el set de validación (después): 7.34
+Mejora de perplejidad en validación: 29.76 -> 7.34
+Evaluando en el dataset de test (final)...
+Perplejidad en el set de test (final): 38.45
+
+--- Paso 11: Guardando modelo y tokenizador localmente en: ./distilbert-base-uncased-finetuned-custom-markdown ---
+Modelo y tokenizador guardados localmente con éxito.
+
+--- Paso 12: Probando el Modelo Fine-tuned con la Pipeline 'fill-mask' ---
+Intentando cargar modelo desde directorio local: ./distilbert-base-uncased-finetuned-custom-markdown
+Cargando pipeline 'fill-mask'...
+All model checkpoint layers were used when initializing TFDistilBertForMaskedLM.
+
+All the layers of TFDistilBertForMaskedLM were initialized from the model checkpoint at ./distilbert-base-uncased-finetuned-custom-markdown.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use TFDistilBertForMaskedLM for predictions without further training.
+
+Error al cargar o usar la pipeline 'fill-mask': name 'torch' is not defined
+Asegúrate de que el modelo está disponible en './distilbert-base-uncased-finetuned-custom-markdown' y que las bibliotecas están instaladas correctamente.
+
+--- Proceso de Fine-tuning y Prueba Finalizado ---
